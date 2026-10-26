@@ -1,0 +1,13 @@
+FROM golang:1.24-alpine
+
+WORKDIR /src
+
+COPY app/main.go .
+
+RUN go build -o /app/server main.go
+
+ENV APP_PORT=8000
+
+EXPOSE 8000
+
+CMD ["/app/server"]
