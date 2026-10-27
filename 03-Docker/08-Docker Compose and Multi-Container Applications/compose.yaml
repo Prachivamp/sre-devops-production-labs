@@ -1,0 +1,35 @@
+
+services:
+  api:
+    build:
+      context: ./api
+    ports:
+      - "127.0.0.1:5001:5001"
+    environment:
+      DB_HOST: db
+      DB_PORT: "5432"
+      DB_NAME: lab08db
+      DB_USER: lab08user
+      DB_PASSWORD: "${DB_PASSWORD:?Set DB_PASSWORD in your environment}"
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: lab08db
+      POSTGRES_USER: lab08user
+      POSTGRES_PASSWORD: "${DB_PASSWORD:?Set DB_PASSWORD in your environment}"
+    volumes:
+      - lab08-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lab08user -d lab08db"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+volumes:
+  lab08-postgres-data:
